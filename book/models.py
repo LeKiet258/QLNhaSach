@@ -9,20 +9,13 @@ class Person(models.Model):
     class Meta:
         verbose_name_plural = 'Thành viên'
         
-    # list_chucvu = (
-	# 		('nhân viên', 'nhân viên'),
-	# 		('thủ kho', 'thủ kho'),
-    #         ('chủ nhà sách', 'chủ nhà sách'),
-    #         ('khách hàng', 'khách hàng')
-	# 		) 
     id = models.CharField(max_length=100, primary_key=True, editable=True)
     ho_ten = models.CharField('Họ tên', max_length=100, null=True)
     ngay_sinh = models.DateField('Ngày sinh', null=True, editable=True)
     so_dien_thoai = models.CharField('Số điện thoại', max_length=13, null=True)
     dia_chi = models.CharField('Địa chỉ', max_length=1000, null=True)
     email = models.CharField('Email', max_length=50, null=True)
-    # chuc_vu = models.CharField('Chức vụ', max_length=100, null=True, choices=list_chucvu)
-    profile_pic = models.ImageField('Ảnh đại diện', default="profile1.png", null=True, blank=True)
+    profile_pic = models.ImageField(default="profile1.png", null=True)
     user = models.OneToOneField(User, blank=True, null=True, on_delete=models.CASCADE) # a user can have 1 customer, a customer have a user
     
     def __str__(self):
@@ -47,7 +40,7 @@ class Person(models.Model):
             for hd in cac_hd:
                 if hd.tong_tien != hd.da_tra and hd.da_tra != -1:
                     s += hd.tong_tien - hd.da_tra
-                    print(hd, s)
+                    # print(hd, s)
             return s
     
 class Sach(models.Model):
@@ -139,11 +132,8 @@ class HoaDon(models.Model):
 class ChiTietHoaDon(models.Model): # 1 lần nhập 1 sách
     # cthd của hóa đơn nào
     hoa_don = models.ForeignKey(HoaDon, verbose_name='Hóa đơn', on_delete=models.PROTECT)
-    # khach_hang = models.ForeignKey(Person, verbose_name='Khách hàng', on_delete=models.PROTECT)
     sach = models.ForeignKey(Sach, verbose_name='Sách mua', on_delete=models.PROTECT)
     so_luong = models.PositiveIntegerField('Số lượng', null=True, default=0, editable=True)
-    # giá bán 1 sản phẩm
-    # gia_ban = models.FloatField(null=True)
     
     def __str__(self):
         return self.hoa_don.id_HD
@@ -165,4 +155,11 @@ class Debt(models.Model):
     @property
     def no_cuoi(self): return self.no_dau + self.phat_sinh
     
+# util model
+class Inventory(models.Model):
+    ten_sach = models.CharField('Tên sách', max_length=100, null=True)
+    ton_dau = models.FloatField(null=True)
+    phat_sinh = models.FloatField(null=True)
 
+    @property
+    def ton_cuoi(self): return self.ton_dau + self.phat_sinh
